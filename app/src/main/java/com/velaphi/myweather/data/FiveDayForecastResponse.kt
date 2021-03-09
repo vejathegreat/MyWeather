@@ -1,5 +1,5 @@
 package com.velaphi.myweather.data
 
-data class ForecastResponse(
+data class FiveDayForecastResponse(
     val list: List<DayWeather>
 )
