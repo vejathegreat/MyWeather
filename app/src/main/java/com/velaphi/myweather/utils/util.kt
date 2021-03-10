@@ -4,9 +4,13 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.widget.ImageView
+import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.velaphi.myweather.R
+import com.velaphi.myweather.data.DayWeather
+import java.text.SimpleDateFormat
 import java.util.*
 
 fun isConnected(context: Context?): Boolean {
@@ -37,21 +41,80 @@ private fun getDayOfWeek(dayOfWeek: Int): String {
 }
 
 @BindingAdapter("imageResource")
-fun setImageResource(imageview: ImageView, icon: String) {
+fun setImageResource(imageView: ImageView, icon: String) {
     when (icon) {
-        "01n" -> imageview.setImageDrawable(imageview, R.mipmap.ic_sunny)
+        "01n" -> imageView.setImageDrawable(imageView, R.mipmap.ic_sunny)
+        "01d" -> imageView.setImageDrawable(imageView, R.mipmap.ic_sunny)
         "02n",
+        "02d",
         "03n",
-        "04n" -> imageview.setImageDrawable(imageview, R.mipmap.ic_cloudy)
+        "03d",
+        "04n",
+        "04d" -> imageView.setImageDrawable(imageView, R.mipmap.ic_cloudy)
         "09n",
+        "09d",
         "10n",
-        "11n" -> imageview.setImageDrawable(imageview, R.mipmap.ic_rainy)
-        "13n" -> imageview.setImageDrawable(imageview, R.drawable.ic_snow)
-        "50n" -> imageview.setImageDrawable(imageview, R.drawable.ic_mist)
+        "10d",
+        "11n",
+        "11d" -> imageView.setImageDrawable(imageView, R.mipmap.ic_rainy)
+        "13n",
+        "13d" -> imageView.setImageDrawable(imageView, R.drawable.ic_snow)
+        "50n",
+        "50d" -> imageView.setImageDrawable(imageView, R.drawable.ic_mist)
     }
-
 }
+
+fun changeLayoutBackground(context: Context, icon: String, linearLayout: LinearLayout) {
+
+    when (icon) {
+        "01n",
+        "01d" -> linearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.sunny))
+        "02n",
+        "02d",
+        "03n",
+        "03d",
+        "04n",
+        "04d" -> linearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.cloudy))
+        "09n",
+        "09d",
+        "10n",
+        "10d",
+        "11d",
+        "11n" -> linearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.rainy))
+        "13n",
+        "13d",
+        "50d",
+        "50n" -> linearLayout.setBackgroundColor(ContextCompat.getColor(context, R.color.black))
+    }
+}
+
 
 private fun ImageView.setImageDrawable(view: ImageView, image: Int) {
     Glide.with(context).load(image).into(view)
+}
+
+fun transformList(dayWeatherList: List<DayWeather>): List<DayWeather> {
+    val weatherList: MutableList<DayWeather> = mutableListOf()
+
+
+    for (dayWeather in dayWeatherList) {
+
+        if (!isSameDay(dayWeather.dt) && isMidDay(dayWeather.dt)) {
+            weatherList.add(dayWeather)
+        }
+    }
+    return weatherList
+}
+
+private fun isMidDay(dateTime: Long): Boolean {
+    val midday = "14 00 00"
+    val time = SimpleDateFormat("HH mm ss").format(Date(dateTime * 1000L))
+    return midday == time
+}
+
+private fun isSameDay(dateTime: Long): Boolean {
+    val fmt = SimpleDateFormat("dd-MM-yyyy")
+    val currentDate = Calendar.getInstance().time
+    val weatherDate = Date(dateTime * 1000L)
+    return fmt.format(currentDate) == fmt.format(weatherDate)
 }

@@ -4,15 +4,21 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.velaphi.myweather.R
 import com.velaphi.myweather.data.CombineResponse
+import com.velaphi.myweather.data.FiveDayForecastResponse
 import com.velaphi.myweather.data.WeatherResponse
 import com.velaphi.myweather.databinding.ActivityMainBinding
 import com.velaphi.myweather.utils.Constant
+import com.velaphi.myweather.utils.changeLayoutBackground
+import com.velaphi.myweather.utils.transformList
 import com.velaphi.myweather.viewModel.WeatherViewModel
 import kotlin.math.roundToInt
 
@@ -44,6 +50,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun processResponse(combineResponse: CombineResponse?) {
         displayCurrentWeather(combineResponse?.weatherResponse)
+        displayForecast(combineResponse?.fiveDayForecastResponse)
+    }
+
+    private fun displayForecast(fiveDayForecastResponse: FiveDayForecastResponse?) {
+        val filteredList = fiveDayForecastResponse?.list?.let { transformList(it) }
+        val forecastRecyclerView = findViewById<RecyclerView>(R.id.recyclerView_forecast)
+
+        var forecastAdapter = ForecastAdapter(filteredList!!)
+        forecastRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+            adapter = forecastAdapter
+        }
     }
 
     private fun displayCurrentWeather(weatherResponse: WeatherResponse?) {
@@ -56,7 +74,13 @@ class MainActivity : AppCompatActivity() {
             this.getString(R.string.degree, weatherResponse?.main?.temp?.roundToInt())
         dataBinding.textViewMaxTemperature.text =
             this.getString(R.string.degree, weatherResponse?.main?.temp_max?.roundToInt())
-
+        val linearLayout = findViewById<LinearLayout>(R.id.main_container)
+        weatherResponse?.weather?.get(0)?.icon?.let {
+            changeLayoutBackground(
+                this,
+                it, linearLayout
+            )
+        }
     }
 
     companion object {
