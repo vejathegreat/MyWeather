@@ -2,7 +2,9 @@ package com.velaphi.myweather.ui
 
 import android.content.Context
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
+import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +45,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
+        viewModel.loadingIndicator.observe(this, Observer {
+            if (it) {
+                dataBinding.progressBar.visibility = View.GONE
+            } else {
+                dataBinding.progressBar.visibility = View.VISIBLE
+            }
+        })
         viewModel.combineResponseData.observe(this, Observer {
+            dataBinding.mainContainer.visibility = View.VISIBLE
             processResponse(it)
         })
     }
