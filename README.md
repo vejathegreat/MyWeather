@@ -23,7 +23,7 @@
 - Location Permission
 
 ***Setup***
-- Insert you api in local.properties ( apiKey="YOUR API KEY")
+- Insert your api key in you local.properties gradle file ***(apiKey="YOUR API KEY")***
 
 **APK**
 - [download link](https://www.dropbox.com/s/umgb9t7jqa7zrsl/myWeather.apk?dl=0)
